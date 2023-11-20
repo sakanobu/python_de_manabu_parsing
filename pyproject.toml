@@ -9,6 +9,81 @@ readme = "README.md"
 python = "^3.11"
 
 
+[tool.poetry.group.dev.dependencies]
+black = "^23.11.0"
+isort = "^5.12.0"
+mypy = "^1.7.0"
+pyproject-flake8 = "5.0.4"
+pytest = "^7.4.3"
+flake8-pytest-style = "^1.7.2"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.flake8]
+# E203: ":"の前の空白を入れないルール
+# W503: 演算子の前に改行しないようにするルール
+extend-ignore = "E203,E266,W503,W504"
+max-line-length = 88
+max-complexity = 10
+
+[tool.isort]
+include_trailing_comma = true
+line_length = 88
+multi_line_output = 3
+profile = 'black'
+
+[tool.mypy]
+# Import discovery
+# import 先のチェックを行わない (デフォルトだとサードパーティーライブラリまでチェックしてしまうため)
+ignore_missing_imports = true
+# Platform configuration
+python_version = "3.11"
+# Untyped definitions and calls
+# 関数定義の引数と戻り値に型アノテーションを必須とする設定だが戻り値まで書くのは面倒なためデフォルト通りオフ
+# disallow_untyped_defs = false
+# 型注釈のない関数だったとしても型チェックを行う
+check_untyped_defs = true
+# デコレーターの型アノテーションは少々複雑なのでデフォルト通りオフ
+# disallow_untyped_decorators = false
+# None and Optional handling
+# デフォルト引数に None が設定された引数は Optional として扱う
+implicit_optional = true
+# Configuring warnings
+# 安全に削除できる冗長なキャストがあれば警告する
+warn_redundant_casts = true
+# mypy エラーに該当しない箇所に `# type: ignore` コメントが付与されていたら警告する(`# type: ignore` が付与されている箇所は mypy のエラーを無視出来る)
+warn_unused_ignores = true
+# 戻り値が Any 型ではない関数の戻り値の型アノテーションが Any のとき警告する
+warn_return_any = true
+# 到達不可能または冗長であると判断されたコードがある時に警告する
+warn_unreachable = true
+# Miscellaneous strictness flags
+# `42 == 'no'` のような常に偽となる比較を警告する
+strict_equality = true
+# Configuring error messages
+# エラー時のメッセージを詳細表示
+show_error_context = true
+# エラー発生箇所の行数/列数を表示
+show_column_numbers = true
+# エラーメッセージを見やすくフォーマットする
+pretty = true
+
+[[tool.mypy.overrides]]
+# tests/ 配下のコードのみを対象とした設定
+module = "tests.*"
+# tests/ 配下のコードは関数定義の引数と戻り値に型アノテーションを必須としない
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+pythonpath = "src"
+testpaths = ["tests", ]
+filterwarnings = ["ignore::DeprecationWarning", ]
